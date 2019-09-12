@@ -14,7 +14,7 @@
 # Firewall
 # Utilité: permet de mettre en place un par-feu efficaces
 # Usage: script -start -restart -stop
-# Auteur: Dylan BRICAR < contact@site-concept.eu>
+# Auteur: Dylan BRICAR <contact@site-concept.eu>
 # Mise à jour le: 11/09/2019
 ##########################################
 
@@ -30,27 +30,27 @@ function start {
     # Fonction de démarrage des règles
     ##########################################
 
-    # [SSH, HTTP, HTTPS, SMTP, SMTP, POP, IMAP, POPS]
-    BASICS_PORTS="22,80,443,25,587,110,143,995"
-    # Adresse IP desquelles le serveur ne doit pas se méfier
-    OFFICIELS_IP="[IP],[IP],[IP]"
-    # Ports des serveurs à bloquer qui ne doivent pas être accessible
+    # [SSH, HTTP, HTTPS, NTP, SMTP, SMTP, POP, IMAP, POPS]
+    BASICS_PORTS="22,80,443,123,25,587,110,143,995"
+    # Adresses IP desquelles le serveur ne doit pas se méfier.
+    OFFICIALS_IP="[IP],[IP],[IP]"
+    # Ports des serveurs à bloquer qui ne doivent pas être accessibles.
     BUNGEE_PORTS="[PORT],[PORT]"
 
     iptables -P INPUT DROP
     iptables -P FORWARD DROP
     iptables -P OUTPUT ACCEPT
     echo -e "$4[OK] Refuse toutes les connexions sauf la sortie.$3"
-    
-    # Début de la gestion du serveur Minecraft
-    
+
+    # Début de la gestion du serveur Minecraft.
+
     iptables -t filter -N bungee
-    iptables -t filter -A bungee -s $OFFICIELS_IP -j ACCEPT
+    iptables -t filter -A bungee -s $OFFICIALS_IP -j ACCEPT
     iptables -t filter -A bungee -j DROP
     iptables -t filter -A INPUT -p tcp -m multiport --dports $BUNGEE_PORTS -j bungee
-    echo -e "$4[OK] Refuse de se connecter au(x) port(s) ${BUNGEE_PORTS} des serveurs avec les IP ${OFFICIELS_IP}.$3"
-    
-    # Fin de la gestion du serveur Minecraft
+    echo -e "$4[OK] Refuse de se connecter au(x) port(s) ${BUNGEE_PORTS} des serveurs avec les IP ${OFFICIALS_IP}.$3"
+
+    # Fin de la gestion du serveur Minecraft.
 
     iptables -t filter -A INPUT -i lo -j ACCEPT
     echo -e "$4[OK] Connexion à localhost.$3"
@@ -60,13 +60,13 @@ function start {
 
     iptables -t filter -A INPUT -p tcp -m multiport --dports $BASICS_PORTS -j ACCEPT
     echo -e "$4[OK] Ouvre les ports ${BASICS_PORTS}.$3"
-    
-    iptables -t filter -A INPUT -p tcp -s ${OFFICIELS_IP} --dport 3306 -j ACCEPT
+
+    iptables -t filter -A INPUT -p tcp -s ${OFFICIALS_IP} --dport 3306 -j ACCEPT
     iptables -t filter -A INPUT -p tcp --dport 3306 -j DROP
-    echo -e "$4[OK] Autorise l'accès à MySQL que via les IP ${OFFICIELS_IP}.$3"
+    echo -e "$4[OK] Autorise l'accès à MySQL que via les IP ${OFFICIALS_IP}.$3"
 
     iptables -t mangle -A PREROUTING -m conntrack --ctstate INVALID -j DROP
-    echo -e "$4[OK] Refuse les packets invalides.$3"
+    echo -e "$4[OK] Refuse les paquets invalides.$3"
 
     iptables -t mangle -A PREROUTING -p tcp -m tcp --tcp-flags FIN,SYN FIN,SYN -j DROP
     iptables -t mangle -A PREROUTING -p tcp -m tcp --tcp-flags SYN,RST SYN,RST -j DROP
@@ -88,7 +88,7 @@ function start {
     iptables -t mangle -A PREROUTING -s 0.0.0.0/8 -j DROP
     iptables -t mangle -A PREROUTING -s 240.0.0.0/5 -j DROP
     iptables -t mangle -A PREROUTING -s 127.0.0.0/8 ! -i lo -j DROP
-    echo -e "$4[OK] Refuse les packets avec des combinaisons étranges.$3"
+    echo -e "$4[OK] Refuse les paquets avec des combinaisons étranges.$3"
 
     iptables -t mangle -A PREROUTING -p icmp -j DROP
     echo -e "$4[OK] Empêche le ping de l'IP.$3"
@@ -98,11 +98,11 @@ function start {
 
     iptables -t raw -A PREROUTING -i eth0 -p tcp -m tcp --syn -m multiport --dports $BASICS_PORTS -m hashlimit --hashlimit-above 200/sec --hashlimit-burst 1000 --hashlimit-mode srcip --hashlimit-name syn --hashlimit-htable-size 2097152 --hashlimit-srcmask 24 -j DROP
     iptables -t filter -A INPUT -p tcp -m connlimit --connlimit-above 100 -j REJECT
-    echo -e "$4[OK] Limite le nombre de connexion par une même IP.$3"
+    echo -e "$4[OK] Limite le nombre de connexions par une même IP.$3"
 
     iptables -A INPUT -p tcp --tcp-flags RST RST -m limit --limit 2/s --limit-burst 2 -j ACCEPT
     iptables -A INPUT -p tcp --tcp-flags RST RST -j DROP
-    echo -e "$4[OK] Limite le nombre de packets RST.$3"
+    echo -e "$4[OK] Limite le nombre de paquets RST.$3"
 
     iptables -A INPUT -p tcp -m conntrack --ctstate NEW -m limit --limit 60/s --limit-burst 100 -j ACCEPT
     iptables -A INPUT -p tcp -m conntrack --ctstate NEW -j DROP
@@ -130,7 +130,7 @@ function stop {
     iptables -P FORWARD ACCEPT
     iptables -P OUTPUT ACCEPT
     echo -e "$1[OK] Accepte toutes les connexions.$3"
-	
+
     iptables -t nat -F
     iptables -t mangle -F
     iptables -F
@@ -138,7 +138,7 @@ function stop {
     iptables -Z
     echo -e "$1[OK] Supprime toutes les règles actives et les chaînes personnalisées.$3"
 
-    echo -e "\n$2[FIN] Suppresion de toutes les règles effectué avec succès !$3"
+    echo -e "\n$2[FIN] Suppresion de toutes les règles effectuées avec succès !$3"
 }
 
 ##########################################
