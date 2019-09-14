@@ -70,7 +70,6 @@ save {
                 if echo "${one_file}" | grep -q "|"
             then
                     path_files+="--exclude='${1}/`echo \"${one_file}\" | sed \"s/|//\"`' ";
-
             else
                     path_files+="${1}/${one_file} ";
             fi
