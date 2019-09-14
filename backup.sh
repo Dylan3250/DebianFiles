@@ -22,7 +22,7 @@ directory_backup="/home/sauvegardes/"
 directory_saving="${directory_backup}${directory_date}"
 
 # Utilisateur | IP | PORT de la machine distante.
-info_ssh=("root" "151.80.110.84" "3293")
+info_ssh=("USER" "IP" "PORT")
 
 # Déclaration des différents dossiers à sauvegarder.
 # [Nom du .tar.gz]="|fichier_à_ignorer |fichier_à_ignorer fichier_a_prendre"
@@ -39,7 +39,6 @@ declare -A minecraft=(
 )
 
 declare -A mysql=(['mysql']="|mysql/tc.log mysql")
-
 
 set_transfert {
     ##################################################
