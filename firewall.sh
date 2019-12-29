@@ -15,7 +15,7 @@
 # Utilité: permet de mettre en place un par-feu efficaces
 # Usage: script -start -restart -stop
 # Auteur: Dylan BRICAR <contact@site-concept.eu>
-# Mise à jour le: 11/09/2019
+# Mise à jour le: 29/12/2020
 ##########################################
 
 # Définition des couleurs pour les messages
@@ -30,8 +30,8 @@ function start {
     # Fonction de démarrage des règles
     ##########################################
 
-    # [SSH, HTTP, HTTPS, NTP, SMTP, SMTP, POP, IMAP, POPS]
-    BASICS_PORTS="22,80,443,123,25,587,110,143,995"
+    # [SSH, HTTP, HTTPS, SMTP, SMTP, POP, IMAP, POPS]
+    BASICS_PORTS="22,80,443,25,587,110,143,995"
     # Adresses IP desquelles le serveur ne doit pas se méfier.
     OFFICIALS_IP="[IP],[IP],[IP]"
     # Ports des serveurs à bloquer qui ne doivent pas être accessibles.
@@ -90,8 +90,9 @@ function start {
     iptables -t mangle -A PREROUTING -s 127.0.0.0/8 ! -i lo -j DROP
     echo -e "$4[OK] Refuse les paquets avec des combinaisons étranges.$3"
 
-    iptables -t mangle -A PREROUTING -p icmp -j DROP
-    echo -e "$4[OK] Empêche le ping de l'IP.$3"
+    # Pas forcément utile
+    # iptables -t mangle -A PREROUTING -p icmp -j DROP
+    # echo -e "$4[OK] Empêche le ping de l'IP.$3"
 
     iptables -t mangle -A PREROUTING -f -j DROP
     echo -e "$4[OK] Bloque la fragmentation TCP.$3"
